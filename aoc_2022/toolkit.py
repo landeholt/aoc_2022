@@ -5,6 +5,8 @@ from pprint import pprint
 from jinja2.environment import Environment
 from jinja2.loaders import FileSystemLoader
 
+RESULT_DIVIDER = r"\n---\n"
+
 env = Environment(loader=FileSystemLoader("./templates/"))
 
 def render(template: str, **data):
@@ -28,7 +30,8 @@ def take(data: Iterable[T], n: int = 1):
             break
 
 def get_local_input(day: int):
-    return (DAY_FOLDER(day) / "data.txt").read_text().split("\n---RESULT---\n")
+    import re
+    return re.split(RESULT_DIVIDER,(DAY_FOLDER(day) / "data.txt").read_text())
 
 
 def scaffold_day(day: int):        
