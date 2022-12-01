@@ -31,7 +31,13 @@ def take(data: Iterable[T], n: int = 1):
 
 def get_local_input(day: int):
     import re
-    return re.split(RESULT_DIVIDER,(DAY_FOLDER(day) / "data.txt").read_text())
+    data = re.split(RESULT_DIVIDER,(DAY_FOLDER(day) / "data.txt").read_text())
+    if len(data) == 3:
+        return data[0], {'first': data[1].strip(), 'second': data[2].strip()}
+    if len(data) == 2:
+        return data[0], {'first': data[1].strip(), 'second': None}
+    return data[0], {'first': None, 'second': None}
+
 
 
 def scaffold_day(day: int):        
