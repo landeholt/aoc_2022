@@ -1,4 +1,5 @@
-from aoc_2022.toolkit import take, get_remote_input
+from aoc_2022.toolkit import get_remote_input
+from aoc_2022.utils import take
 
 data = get_remote_input(1)
 
@@ -8,7 +9,6 @@ def calorie_generator(data):
 
 def first(data: str):
     return max(calorie_generator(data))
-
 
 
 def second(data: str):

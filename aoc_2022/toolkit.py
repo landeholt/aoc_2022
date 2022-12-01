@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Iterable, TypeVar
 import requests
 from pprint import pprint
 from jinja2.environment import Environment
@@ -13,21 +12,14 @@ def render(template: str, **data):
     return env.get_template(f"{template}.py.j2").render(**data)
 
 def get_remote_input(day: int):
-    from aoc_2022.env import cookies
-    return requests.get(f"https://adventofcode.com/2022/day/{day}/input", cookies=cookies).text
+    from aoc_2022.env import cookies, year
+    return requests.get(f"https://adventofcode.com/{year}/day/{day}/input", cookies=cookies).text
 
 DAY_FOLDER = lambda day : Path(f"aoc_2022/day{day:0>2}")
 TEST_DAY_FILE = lambda day : Path(f"tests/test_day{day:0>2}.py")
 def present(data):
     pprint(data)
 
-T = TypeVar("T")
-
-def take(data: Iterable[T], n: int = 1):
-    for i, d in enumerate(data, 1):
-        yield d
-        if i == n:
-            break
 
 def get_local_input(day: int):
     import re
