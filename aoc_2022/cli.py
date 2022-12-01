@@ -103,7 +103,7 @@ def test(path, intra, all):
     elif all and intra:
         pytest.main([f"tests/test_day{day:0>2}.py", "-v"])
     else:
-        pytest.main([f"tests/test_day{day:0>2}.py::test_{puzzle}", "-v"])
+        pytest.main([f"tests/test_day{day:0>2}.py::test_{puzzle}", "-v", "-s"])
 
 
 if __name__ == "__main__":

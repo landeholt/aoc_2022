@@ -1,11 +1,11 @@
 from aoc_2022.toolkit import get_local_input({{ day }})
 
-data = get_local_input({{ day }})
+data, first_result, second_result = get_local_input({{ day }})
 
 def test_first():
     from aoc_2022.day{{ day_formatted }}.core import first
-    assert first(data) != None
+    assert str(first(data)) != None
 
 def test_second():
     from aoc_2022.day{{ day_formatted }}.core import second
-    assert second(data) != None
+    assert str(second(data)) != None

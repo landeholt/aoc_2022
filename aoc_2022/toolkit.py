@@ -28,7 +28,7 @@ def take(data: Iterable[T], n: int = 1):
             break
 
 def get_local_input(day: int):
-    return (DAY_FOLDER(day) / "data.txt").read_text()
+    return (DAY_FOLDER(day) / "data.txt").read_text().split("\n---RESULT---\n")
 
 
 def scaffold_day(day: int):        
