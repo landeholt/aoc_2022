@@ -35,7 +35,6 @@ def scaffold_day(day: int):
     folder = DAY_FOLDER(day)
     if not folder.exists():
         folder.mkdir()
-        (folder / "__main__.py").touch()
         (folder / "data.txt").touch()
         core = folder / "core.py"
         core.touch()
@@ -66,4 +65,8 @@ def remove_day(day: int):
     if test.exists():
         test.unlink()
 
-    
+
+def get_puzzle_fn(day: int, puzzle: str):
+    locals = {}
+    exec(f"from aoc_2022.day{day:0>2} import core", None, locals)
+    return getattr(locals['core'], puzzle)
