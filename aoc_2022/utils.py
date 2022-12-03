@@ -9,6 +9,10 @@ def take(data: Iterable[T], n: int = 1) -> Generator[T, None, None]:
         if i == n:
             break
 
+def first(data: Iterable[T]):
+    result, *_ = take(data, n=1)
+    return result
+
 def flat_map(fn, seq: Iterable[Iterable[T]]) -> Generator[T, None, None]:
     return (y for ys in seq for y in fn(ys))
 

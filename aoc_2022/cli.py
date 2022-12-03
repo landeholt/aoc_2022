@@ -2,8 +2,10 @@ from typing import cast
 import click
 import arrow
 
-TABLE = {"1": "first", "2": "second"}
+from aoc_2022.utils import first
 
+TABLE = {"1": "first", "2": "second"}
+REVERSE_TABLE = {"first": "1", "second": "2"}
 
 @click.group()
 def cli():
@@ -44,10 +46,20 @@ def get_path(path):
 @click.argument('day', default="today")
 def create(day):
     """ Setup a single day folder """
-    from aoc_2022.toolkit import scaffold_day
+    from aoc_2022.toolkit import scaffold_day, get_remote_data
 
     day = get_day(day)
-    scaffold_day(day)
+    data = get_remote_data(day)
+    folder = scaffold_day(day, data)
+    if data is None:
+        click.echo(f"Was not able to scrape puzzle data for day {day:0>2}")
+        click.echo("Please fill it in manually before testing.")
+    else:
+        click.echo(f"Scaffold created at {folder.as_posix()}")
+        data_file = first(folder.glob("*.txt"))
+
+        click.echo(f"Please verify that {data_file.as_posix()} is correct.")
+    
 
 
 
@@ -85,6 +97,31 @@ def run(path, remote):
         click.echo(prefix + f"Cannot find puzzle for: {e}")
     except ModuleNotFoundError as e:
         click.echo(prefix + f" Puzzle day{day:0>2}:{puzzle} doesnt exist")
+
+@cli.command()
+@click.argument("path", default="today:1")
+def submit(path):
+    """ Submit a puzzle """
+    from aoc_2022.toolkit import get_puzzle_fn, get_remote_input, post, parse_result
+    try:
+        day, puzzle = get_path(path)
+    except RuntimeError:
+        return
+    try:
+        fn = get_puzzle_fn(day, puzzle)
+        click.echo(f"Running {puzzle} puzzle for {arrow.now().replace(month=12,day=int(day)).format('DD MMMM')}")
+        answer = fn(get_remote_input(day))
+        click.echo(f"submitting: {answer}")
+        result = parse_result(post(day, {'level': REVERSE_TABLE[puzzle], 'answer': answer}))
+        click.echo(result)
+
+
+
+    
+    except KeyError as e:
+        click.echo(f"Cannot find puzzle for: {e}")
+    except ModuleNotFoundError as e:
+        click.echo(f" Puzzle day{day:0>2}:{puzzle} doesnt exist")
 
 @cli.command()
 @click.argument("path", default="today:1")
