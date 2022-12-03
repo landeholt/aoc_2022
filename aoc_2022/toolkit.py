@@ -39,13 +39,13 @@ def parse_result(html_doc):
     import re
     bs = BeautifulSoup(html_doc, "html.parser")
     try:
-        text = bs.find("article").find("p").text
+        text = bs.find("article").find("p").text # type: ignore
         match = re.match(r"(That's not the right answer\.|)", text)
         if match:
             return "Incorrect"
         return "Correct"
     except AttributeError:
-        return
+        return "Retry manually.."
     
 
 DAY_FOLDER = lambda day : Path(f"aoc_2022/day{day:0>2}")
