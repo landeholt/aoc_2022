@@ -21,9 +21,9 @@ def present(data):
     pprint(data)
 
 
-def get_local_input(day: int):
+def get_local_input(day: int, data_file = "data.txt"):
     import re
-    data = re.split(RESULT_DIVIDER,(DAY_FOLDER(day) / "data.txt").read_text())
+    data = re.split(RESULT_DIVIDER,(DAY_FOLDER(day) / data_file).read_text())
     if len(data) == 3:
         return data[0], {'first': data[1].strip(), 'second': data[2].strip()}
     if len(data) == 2:
