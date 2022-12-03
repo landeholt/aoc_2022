@@ -1,6 +1,7 @@
 # Advent of code
 #### made easy
 
+
 This repository is allows you to focus 100% on the task at hand, the daily puzzle. The rest is taken care by the repo.
 
 In order to have all the functionality you need to use the package manager `poetry`, such that you can use the command aoc within the poetry shell.
@@ -27,6 +28,9 @@ It will run the **live** puzzle input through your code and give you the answer.
 
 It will test the **local** puzzle input through your code with the help of pytest. You need to provide a path to it in the `<day>:<level>` pattern.
 
+## aoc submit
+
+send your answer directly to `adventofcode.com` through the cli.
 # Environment
 
 In order for the cli to run through the **live** input data, it needs your session cookie. Create a `.env` file and store it in the root of this repository. You will find your sessionid by inspecting your network traffic sent to `adventofcode.com`
