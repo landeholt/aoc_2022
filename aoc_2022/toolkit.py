@@ -1,10 +1,14 @@
 from pathlib import Path
+from typing import Any, Dict
 import requests
-from pprint import pprint
+import arrow
 from jinja2.environment import Environment
 from jinja2.loaders import FileSystemLoader
 
 RESULT_DIVIDER = "\n---\n"
+DAY_FOLDER = lambda day: Path(f"aoc_2022/day{day:0>2}")
+TEST_DAY_FILE = lambda day: Path(f"tests/test_day{day:0>2}.py")
+ROOT = Path(__file__).parent.parent
 
 env = Environment(loader=FileSystemLoader("./templates/"))
 
@@ -47,27 +51,88 @@ def get_remote_data(day: int):
         return
 
 
-def parse_result(html_doc):
-    from bs4 import BeautifulSoup
-    import re
+def get_or_create(path: Path):
+    from oyaml import safe_load
+    from collections import defaultdict
 
-    bs = BeautifulSoup(html_doc, "html.parser")
+    ds = defaultdict(dict)
+    if path.exists():
+        data = safe_load(path.open("r"))
+        ds.update(data)
+        return ds
+    path.touch()
+    return ds
+
+
+def update(path: Path, data: Dict[str, Any]):
+    from oyaml import safe_dump
+
+    safe_dump(data, path.open("w"))
+
+
+def create_stat(type, day, ts, **context):
+    from aoc_2022.utils import first
+
+    day = f"day{day:0>2}"
+    file = ROOT / "stats.yaml"
+    data = get_or_create(file)
+    part = context.pop("part", None)
+    answer = context.pop("answer", None)
     try:
-        text = bs.find("article").find("p").text  # type: ignore
-        match = re.match(r"(That's not the right answer\.|)", text)
-        if match:
-            return "Incorrect"
-        return "Correct"
-    except AttributeError:
-        return "Retry manually.."
+        if type == "create":
+            data[day] = {type: ts}
+        elif not data.get(day):
+            return
+        else:
+            if not data[day].get(type):
+                data[day][type] = []
+            if not first(
+                filter(
+                    lambda e: e["part"] == part and e["answer"] == "pass",
+                    data[day][type],
+                )
+            ):
+                data[day][type].append({"part": part, "ts": ts, "answer": answer})
+
+        update(file, dict(data))
+    except KeyError:
+        return
+    finally:
+        return data[day]
 
 
-DAY_FOLDER = lambda day: Path(f"aoc_2022/day{day:0>2}")
-TEST_DAY_FILE = lambda day: Path(f"tests/test_day{day:0>2}.py")
+def check_stat(type, day, part):
+    from aoc_2022.utils import first
 
+    day = f"day{day:0>2}"
+    file = ROOT / "stats.yaml"
+    data = get_or_create(file)
 
-def present(data):
-    pprint(data)
+    if not data.get(day):
+        return
+    try:
+        start: int = data[day]["create"]
+        row = first(
+            sorted(
+                filter(
+                    lambda e: e["part"] == part and e["answer"] == "pass",
+                    data[day][type],
+                ),
+                key=lambda e: e["ts"],
+            )
+        )
+        if row:
+            end = row["ts"]
+        else:
+            raise KeyError
+        delta = end - start
+        return (
+            arrow.now()
+            .shift(seconds=delta)
+            .humanize(only_distance=True, granularity=["minute", "second"])
+        )
+    except KeyError:
+        return None
 
 
 def get_local_input(day: int, data_file="data.txt"):

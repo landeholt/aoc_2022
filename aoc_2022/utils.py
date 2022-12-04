@@ -11,9 +11,12 @@ def take(data: Iterable[T], n: int = 1) -> Generator[T, None, None]:
             break
 
 
-def first(data: Iterable[T]):
-    result, *_ = take(data, n=1)
-    return result
+def first(data: Iterable[T], default = None):
+    try:
+        result, *_ = take(data, n=1)
+        return result
+    except ValueError:
+        return default
 
 
 def flat_map(fn, seq: Iterable[Iterable[T]]) -> Generator[T, None, None]:

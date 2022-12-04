@@ -47,9 +47,11 @@ def get_path(path):
 
 @cli.command()
 @click.argument("day", default="today")
-def create(day):
+@click.option("-t", "--track", default=True)
+def create(day, track):
     """Setup a single day folder"""
-    from aoc_2022.toolkit import scaffold_day, get_remote_data
+    from aoc_2022.toolkit import scaffold_day, get_remote_data, create_stat
+    from time import monotonic
 
     day = get_day(day)
     data = get_remote_data(day)
@@ -60,8 +62,12 @@ def create(day):
     else:
         click.echo(f"Scaffold created at {folder.as_posix()}")
         data_file = first(folder.glob("*.txt"))
-
-        click.echo(f"Please verify that {data_file.as_posix()} is correct.")
+        if data_file:
+            click.echo(f"Please verify that {data_file.as_posix()} is correct.")
+    if track:
+        ts = arrow.now()
+        create_stat("create", day, int(ts.timestamp()))
+        click.echo(f"A timer was started at {ts.format('HH:mm:ss')}. Good luck!")
 
 
 @cli.command()
@@ -109,7 +115,13 @@ def run(path, remote):
 @click.argument("path", default="today:1")
 def submit(path):
     """Submit a puzzle"""
-    from aoc_2022.toolkit import get_puzzle_fn, get_remote_input, post, parse_result
+    from aoc_2022.toolkit import (
+        get_puzzle_fn,
+        get_remote_input,
+        post,
+        create_stat,
+        check_stat,
+    )
 
     try:
         day, puzzle = get_path(path)
@@ -121,11 +133,26 @@ def submit(path):
             f"Running {puzzle} puzzle for {arrow.now().replace(month=12,day=int(day)).format('DD MMMM')}"
         )
         answer = fn(get_remote_input(day))
+        ts = arrow.now()
         click.echo(f"submitting: {answer}")
-        result = parse_result(
-            post(day, {"level": REVERSE_TABLE[puzzle], "answer": answer})
+        result = post(day, {"level": REVERSE_TABLE[puzzle], "answer": answer})
+        passed = "That's the right answer" in result
+        create_stat(
+            "submit",
+            day,
+            int(ts.timestamp()),
+            part=puzzle,
+            answer="pass" if passed else "fail",
         )
-        click.echo(result)
+
+        if passed:
+            click.echo("Accepted answer")
+            time_spent = check_stat("submit", day, puzzle)
+            if time_spent:
+                click.echo(f"{puzzle} part took {time_spent} to pass.")
+            return
+
+        click.echo("Wrong answer..")
 
     except KeyError as e:
         click.echo(f"Cannot find puzzle for: {e}")
@@ -135,22 +162,29 @@ def submit(path):
 
 @cli.command()
 @click.argument("path", default="today:1")
-@click.option("--all", default=False, is_flag=True)
-@click.option("--intra", default=False, is_flag=True)
-def test(path, intra, all):
+def test(path):
+    from aoc_2022.toolkit import create_stat, check_stat
+    import pytest
+
     try:
         day, puzzle = get_path(path)
     except RuntimeError:
         return
 
-    import pytest
+    result = pytest.main([f"tests/test_day{day:0>2}.py::test_{puzzle}", "-v", "-s"])
 
-    if all:
-        pytest.main(["tests/", "-v"])
-    elif all and intra:
-        pytest.main([f"tests/test_day{day:0>2}.py", "-v"])
-    else:
-        pytest.main([f"tests/test_day{day:0>2}.py::test_{puzzle}", "-v", "-s"])
+    ts = arrow.now()
+    create_stat(
+        "test",
+        day,
+        int(ts.timestamp()),
+        part=puzzle,
+        answer="pass" if result != 1 else "fail",
+    )
+
+    time_spent = check_stat("test", day, puzzle)
+    if time_spent:
+        click.echo(f"{puzzle} part took {time_spent} to pass.")
 
 
 if __name__ == "__main__":
