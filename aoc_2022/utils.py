@@ -19,7 +19,7 @@ def first(data: Iterable[T], default = None):
         return default
 
 
-def flat_map(fn, seq: Iterable[Iterable[T]]) -> Generator[T, None, None]:
+def fold(fn, seq: Iterable[Iterable[T]]) -> Generator[T, None, None]:
     return (y for ys in seq for y in fn(ys))
 
 

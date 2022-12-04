@@ -1,6 +1,6 @@
 from typing import Set, Tuple
 from aoc_2022.toolkit import *
-from aoc_2022.utils import flat_map, partition
+from aoc_2022.utils import fold, partition
 
 data = get_remote_input(3)
 
@@ -20,7 +20,7 @@ def first(data: str):
     return sum(
         map(
             priority,
-            flat_map(lambda s: set.intersection(*s), map(divide, data.splitlines())),
+            fold(lambda s: set.intersection(*s), map(divide, data.splitlines())),
         )
     )
 
@@ -29,7 +29,7 @@ def second(data: str):
     return sum(
         map(
             priority,
-            flat_map(
+            fold(
                 lambda group: set.intersection(*(set(g) for g in group)),
                 partition(data.splitlines(), n=3),
             ),
