@@ -16,28 +16,34 @@ class Player(int, Enum):
     draw = 30
     win = 60
 
-
     @property
     def win_table(self):
         return {
-                Player.rock   : Player.scissor,
-                Player.scissor: Player.paper,
-                Player.paper  : Player.rock
-            }
-    
+            Player.rock: Player.scissor,
+            Player.scissor: Player.paper,
+            Player.paper: Player.rock,
+        }
+
     @property
     def lose_table(self):
         return {
             Player.scissor: Player.rock,
-            Player.paper  : Player.scissor,
-            Player.rock   : Player.paper
+            Player.paper: Player.scissor,
+            Player.rock: Player.paper,
         }
-            
+
     @staticmethod
     def convert(*tokens):
-        rules = {'X': Player.rock, 'Y': Player.paper, 'Z': Player.scissor, 'A': Player.rock, 'B': Player.paper, 'C': Player.scissor}
+        rules = {
+            "X": Player.rock,
+            "Y": Player.paper,
+            "Z": Player.scissor,
+            "A": Player.rock,
+            "B": Player.paper,
+            "C": Player.scissor,
+        }
         return [rules[t] for t in tokens]
-    
+
     def score(self, opponent: "Player", allow_cheat=False):
 
         if allow_cheat:
@@ -50,7 +56,11 @@ class Player(int, Enum):
         return self.value
 
     def cheat(self, opponent: "Player"):
-        strategy: Dict[Player, Player] = {Player.rock: Player.lose, Player.paper: Player.draw, Player.scissor: Player.win}
+        strategy: Dict[Player, Player] = {
+            Player.rock: Player.lose,
+            Player.paper: Player.draw,
+            Player.scissor: Player.win,
+        }
 
         if strategy[self] == Player.draw:
             return opponent
@@ -60,21 +70,25 @@ class Player(int, Enum):
             return self.win_table[opponent]
 
 
-def reducer(allow_cheat = False):
+def reducer(allow_cheat=False):
     def wrapper(acc, it):
         opponent, player = Player.convert(*it)
         acc += player.score(opponent, allow_cheat=allow_cheat)
         return acc
+
     return wrapper
+
 
 def parse(data):
     import re
+
     return re.findall(r"(A|B|C)\s+(Y|X|Z)", data)
-    
+
 
 def first(data: str):
-    scores = reduce(reducer(allow_cheat=False),parse(data), 0)
+    scores = reduce(reducer(allow_cheat=False), parse(data), 0)
     return scores
 
+
 def second(data: str):
-    return reduce(reducer(allow_cheat=True),parse(data), 0)
+    return reduce(reducer(allow_cheat=True), parse(data), 0)
