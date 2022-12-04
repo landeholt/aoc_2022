@@ -32,7 +32,7 @@ It will test the **local** puzzle input through your code with the help of pytes
 
 send your answer directly to `adventofcode.com` through the cli.
 
-## aoc submit
+## aoc stats
 
 check the stats for a particular day or part.
 # Environment
