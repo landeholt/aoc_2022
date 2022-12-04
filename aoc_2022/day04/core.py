@@ -19,11 +19,11 @@ def to_set(pair):
 
 
 def contained(pair):
-    return int(set.issubset(*to_set(pair)) or set.issuperset(*to_set(pair)))
+    return set.issubset(*to_set(pair)) or set.issuperset(*to_set(pair))
 
 
 def intersects(pair):
-    return int(not set.isdisjoint(*to_set(pair)))
+    return not set.isdisjoint(*to_set(pair))
 
 
 def first(data: str):
