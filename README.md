@@ -31,6 +31,10 @@ It will test the **local** puzzle input through your code with the help of pytes
 ## aoc submit
 
 send your answer directly to `adventofcode.com` through the cli.
+
+## aoc submit
+
+check the stats for a particular day or part.
 # Environment
 
 In order for the cli to run through the **live** input data, it needs your session cookie. Create a `.env` file and store it in the root of this repository. You will find your sessionid by inspecting your network traffic sent to `adventofcode.com`

@@ -6,7 +6,6 @@ data = get_remote_input(4)
 
 def parse(data: str):
     import re
-
     return partition(re.findall(r"(?:(\d+)-(\d+)),?", data), n=2)
 
 
@@ -19,7 +18,8 @@ def to_set(pair):
 
 
 def contained(pair):
-    return set.issubset(*to_set(pair)) or set.issuperset(*to_set(pair))
+    p = list(to_set(pair))
+    return set.issubset(*p) or set.issuperset(*p)
 
 
 def intersects(pair):

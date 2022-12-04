@@ -1,7 +1,8 @@
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List, Literal, TypedDict
 import requests
 import arrow
+from collections import defaultdict
 from jinja2.environment import Environment
 from jinja2.loaders import FileSystemLoader
 
@@ -9,6 +10,15 @@ RESULT_DIVIDER = "\n---\n"
 DAY_FOLDER = lambda day: Path(f"aoc_2022/day{day:0>2}")
 TEST_DAY_FILE = lambda day: Path(f"tests/test_day{day:0>2}.py")
 ROOT = Path(__file__).parent.parent
+
+class SummaryDict(TypedDict):
+    part: str
+    ts: int
+    answer: Literal["pass", "fail"]
+class DatastructureDict(TypedDict):
+    create: int
+    test: List[SummaryDict]
+    submit: List[SummaryDict]
 
 env = Environment(loader=FileSystemLoader("./templates/"))
 
@@ -50,18 +60,24 @@ def get_remote_data(day: int):
     except AttributeError:
         return
 
+def create_ds() -> Dict[str, DatastructureDict]:
+    return dict()
+
+
+def get_file(path: Path):
+    from oyaml import safe_load
+    data = safe_load(path.open("r"))
+    ds = create_ds()
+    ds.update(data)
+    return ds
+
 
 def get_or_create(path: Path):
-    from oyaml import safe_load
-    from collections import defaultdict
 
-    ds = defaultdict(dict)
     if path.exists():
-        data = safe_load(path.open("r"))
-        ds.update(data)
-        return ds
+        return get_file(path)
     path.touch()
-    return ds
+    return create_ds()
 
 
 def update(path: Path, data: Dict[str, Any]):
@@ -80,7 +96,7 @@ def create_stat(type, day, ts, **context):
     answer = context.pop("answer", None)
     try:
         if type == "create":
-            data[day] = {type: ts}
+            data[day] = {"create": ts}  # type: ignore
         elif not data.get(day):
             return
         else:
@@ -93,8 +109,7 @@ def create_stat(type, day, ts, **context):
                 )
             ):
                 data[day][type].append({"part": part, "ts": ts, "answer": answer})
-
-        update(file, dict(data))
+        update(file, data)
     except KeyError:
         return
     finally:
@@ -103,16 +118,10 @@ def create_stat(type, day, ts, **context):
 
 def check_stat(type, day, part):
     from aoc_2022.utils import first
-
     day = f"day{day:0>2}"
-    file = ROOT / "stats.yaml"
-    data = get_or_create(file)
 
-    if not data.get(day):
-        return
-    try:
-        start: int = data[day]["create"]
-        row = first(
+    def get_earliest_row(type, part, total = False):
+        return first(
             sorted(
                 filter(
                     lambda e: e["part"] == part and e["answer"] == "pass",
@@ -121,6 +130,24 @@ def check_stat(type, day, part):
                 key=lambda e: e["ts"],
             )
         )
+
+    file = ROOT / "stats.yaml"
+    data = get_or_create(file)
+
+    if not data.get(day):
+        return
+    try:
+
+        if part == "second":
+            row = get_earliest_row(type, "first")
+            if row:
+                start = row['ts']
+            else:
+                start = data[day]["create"]
+        else:
+            start = data[day]["create"]
+
+        row = get_earliest_row(type, part)
         if row:
             end = row["ts"]
         else:
@@ -129,7 +156,7 @@ def check_stat(type, day, part):
         return (
             arrow.now()
             .shift(seconds=delta)
-            .humanize(only_distance=True, granularity=["minute", "second"])
+            .humanize(granularity=["minute", "second"])
         )
     except KeyError:
         return None
