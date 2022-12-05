@@ -53,12 +53,13 @@ def get_remote_data(day: int):
     html_doc = get(day)
     bs = BeautifulSoup(html_doc, "html.parser")
     try:
+        description = [e.text for e in bs.select("main article")]  # type: ignore
         data = [bs.find("pre").find("code").text]  # type: ignore
         answers = [e.text for e in bs.select("code em")[-2:]]
         data += answers
-        return RESULT_DIVIDER.join(data)
+        return RESULT_DIVIDER.join(data), description
     except AttributeError:
-        return
+        return None, None
 
 def create_ds() -> Dict[str, DatastructureDict]:
     return dict()
@@ -173,7 +174,7 @@ def get_local_input(day: int, data_file="data.txt"):
     return data[0], {"first": None, "second": None}
 
 
-def scaffold_day(day: int, data=None):
+def scaffold_day(day: int, data=None, description=None):
     folder = DAY_FOLDER(day)
     if not folder.exists():
         folder.mkdir()
@@ -183,7 +184,7 @@ def scaffold_day(day: int, data=None):
             data_file.write_text(data=data)
         core = folder / "core.py"
         core.touch()
-        core.write_text(data=render("core", day=day))
+        core.write_text(data=render("core", day=day, description=description))
 
     test = TEST_DAY_FILE(day)
     if not test.exists():

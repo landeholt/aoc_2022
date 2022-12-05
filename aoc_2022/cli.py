@@ -51,8 +51,8 @@ def create(day, track):
     from time import monotonic
 
     day = get_day(day)
-    data = get_remote_data(day)
-    folder = scaffold_day(day, data)
+    data, description = get_remote_data(day)
+    folder = scaffold_day(day, data, description)
     if data is None:
         click.echo(f"Was not able to scrape puzzle data for day {day:0>2}")
         click.echo("Please fill it in manually before testing.")
