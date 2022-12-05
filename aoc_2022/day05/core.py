@@ -14,7 +14,7 @@ def parse(data: str):
 
 
 def create_stacks(names, items):
-    stacks = dict(zip(names, trans(map(list,partition(items, n=len(names))))))
+    stacks = dict(zip(names, trans(map(list, partition(items, n=len(names))))))
     for k, v in stacks.items():
         stacks[k] = [crate[1] for crate in v if crate.startswith("[")]
     return stacks
@@ -22,22 +22,27 @@ def create_stacks(names, items):
 
 def reorder(stacks, procedures, multiple=False):
     for n, f, t in procedures:
-        crates = deepcopy(stacks[f][: int(n)])
+        n = int(n)
+        crates = deepcopy(stacks[f][:n])
         if not multiple:
             crates.reverse()
         stacks[t] = crates + stacks[t]
-        stacks[f] = stacks[f][int(n) :]
+        stacks[f] = stacks[f][n:]
+
+
+def top_crates(stacks):
+    return "".join(v[0] for v in stacks.values())
 
 
 def first(data: str):
     names, items, procedures = parse(data)
     stacks = create_stacks(names, items)
     reorder(stacks, procedures)
-    return "".join(stacks[n][0] for n in names)
+    return top_crates(stacks)
 
 
 def second(data: str):
     names, items, procedures = parse(data)
     stacks = create_stacks(names, items)
     reorder(stacks, procedures, multiple=True)
-    return "".join(stacks[n][0] for n in names)
+    return top_crates(stacks)
