@@ -113,7 +113,7 @@ def create_stat(type, day, ts, **context):
     except KeyError:
         return
     finally:
-        return data[day]
+        return data.get(day)
 
 
 def check_stat(type, day, part):

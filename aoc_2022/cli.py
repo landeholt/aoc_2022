@@ -147,7 +147,7 @@ def submit(path):
         )
 
         if passed:
-            click.echo("Accepted answer")
+            click.echo("Answer accepted, good job!")
             time_spent = check_stat("submit", day, puzzle)
             if time_spent:
                 click.echo(f"{puzzle} part took {time_spent} to pass.")

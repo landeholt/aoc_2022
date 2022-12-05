@@ -1,5 +1,5 @@
 from itertools import chain, islice
-from typing import Generator, Iterable, TypeVar
+from typing import Generator, Iterable, List, Tuple, TypeVar
 
 T = TypeVar("T")
 
@@ -23,10 +23,10 @@ def fold(fn, seq: Iterable[Iterable[T]]) -> Generator[T, None, None]:
     return (y for ys in seq for y in fn(ys))
 
 
-def partition(seq: Iterable[T], n=1) -> "Generator[chain[T], None, None]":
+def partition(seq: Iterable[T], n=1) -> Generator[Tuple[T], None, None]:
     iterator = iter(seq)
     for first in iterator:
-        yield chain([first], islice(iterator, n - 1))
+        yield tuple(chain([first], islice(iterator, n - 1)))
 
 
 def intmap(data: Iterable[str]):
