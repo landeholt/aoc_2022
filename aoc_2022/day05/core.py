@@ -14,7 +14,7 @@ def parse(data: str):
 
 
 def create_stacks(names, items):
-    stacks = dict(zip(names, trans(map(list, partition(items, n=len(names))))))
+    stacks = dict(zip(names, trans(partition(items, n=len(names)))))
     for k, v in stacks.items():
         stacks[k] = [crate[1] for crate in v if crate.startswith("[")]
     return stacks
