@@ -1,5 +1,5 @@
 from itertools import chain, islice
-from typing import Generator, Iterable, List, Tuple, TypeVar
+from typing import Any, Generator, Iterable, List, Tuple, TypeVar
 
 T = TypeVar("T")
 
@@ -22,6 +22,8 @@ def first(data: Iterable[T], default = None):
 def fold(fn, seq: Iterable[Iterable[T]]) -> Generator[T, None, None]:
     return (y for ys in seq for y in fn(ys))
 
+def isdistinct(seq: Iterable[Any]):
+    return len(list(seq)) == len(set(seq))
 
 def partition(seq: Iterable[T], n=1) -> Generator[Tuple[T], None, None]:
     iterator = iter(seq)

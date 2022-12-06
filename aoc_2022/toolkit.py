@@ -53,7 +53,7 @@ def get_remote_data(day: int):
     html_doc = get(day)
     bs = BeautifulSoup(html_doc, "html.parser")
     try:
-        description = [e.text for e in bs.select("main article")]  # type: ignore
+        description = [str(e) for e in bs.select("main article")]
         data = [bs.find("pre").find("code").text]  # type: ignore
         answers = [e.text for e in bs.select("code em")[-2:]]
         data += answers
@@ -175,6 +175,9 @@ def get_local_input(day: int, data_file="data.txt"):
 
 
 def scaffold_day(day: int, data=None, description=None):
+    from os import system
+    import shlex
+    from markdownify import markdownify as md
     folder = DAY_FOLDER(day)
     if not folder.exists():
         folder.mkdir()
@@ -185,6 +188,14 @@ def scaffold_day(day: int, data=None, description=None):
         core = folder / "core.py"
         core.touch()
         core.write_text(data=render("core", day=day, description=description))
+
+        if description:
+            puzzle_file = folder / "puzzle.md"
+            puzzle_file.touch()
+            puzzle_file.write_text("".join(md(d) for d in description))
+                
+        
+            system(f"code {puzzle_file}")
 
     test = TEST_DAY_FILE(day)
     if not test.exists():
