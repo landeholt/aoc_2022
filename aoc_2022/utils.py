@@ -46,9 +46,9 @@ def str_trans(data: Iterable[Iterable[T]]):
     return map(join, zip(*data))
 
 
-def argmin(a):
-    return min(range(len(a)), key=lambda x: a[x])
+def argmin(a: Iterable[Any]):
+    return min(enumerate(a), key=lambda x: x[1])[0]
 
 
-def argmax(a):
-    return max(range(len(a)), key=lambda x: a[x])
+def argmax(a: Iterable[Any]):
+    return max(enumerate(a), key=lambda x: x[1])[0]
