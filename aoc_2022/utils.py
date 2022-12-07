@@ -11,7 +11,7 @@ def take(data: Iterable[T], n: int = 1) -> Generator[T, None, None]:
             break
 
 
-def first(data: Iterable[T], default = None):
+def first(data: Iterable[T], default=None):
     try:
         result, *_ = take(data, n=1)
         return result
@@ -22,8 +22,10 @@ def first(data: Iterable[T], default = None):
 def fold(fn, seq: Iterable[Iterable[T]]) -> Generator[T, None, None]:
     return (y for ys in seq for y in fn(ys))
 
+
 def isdistinct(seq: Iterable[Any]):
     return len(list(seq)) == len(set(seq))
+
 
 def partition(seq: Iterable[T], n=1) -> Generator[Tuple[T], None, None]:
     iterator = iter(seq)

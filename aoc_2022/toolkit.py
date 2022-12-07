@@ -11,14 +11,18 @@ DAY_FOLDER = lambda day: Path(f"aoc_2022/day{day:0>2}")
 TEST_DAY_FILE = lambda day: Path(f"tests/test_day{day:0>2}.py")
 ROOT = Path(__file__).parent.parent
 
+
 class SummaryDict(TypedDict):
     part: str
     ts: int
     answer: Literal["pass", "fail"]
+
+
 class DatastructureDict(TypedDict):
     create: int
     test: List[SummaryDict]
     submit: List[SummaryDict]
+
 
 env = Environment(loader=FileSystemLoader("./templates/"))
 
@@ -61,12 +65,14 @@ def get_remote_data(day: int):
     except AttributeError:
         return None, None
 
+
 def create_ds() -> Dict[str, DatastructureDict]:
     return dict()
 
 
 def get_file(path: Path):
     from oyaml import safe_load
+
     data = safe_load(path.open("r"))
     ds = create_ds()
     ds.update(data)
@@ -119,9 +125,10 @@ def create_stat(type, day, ts, **context):
 
 def check_stat(type, day, part):
     from aoc_2022.utils import first
+
     day = f"day{day:0>2}"
 
-    def get_earliest_row(type, part, total = False):
+    def get_earliest_row(type, part, total=False):
         return first(
             sorted(
                 filter(
@@ -142,7 +149,7 @@ def check_stat(type, day, part):
         if part == "second":
             row = get_earliest_row(type, "first")
             if row:
-                start = row['ts']
+                start = row["ts"]
             else:
                 start = data[day]["create"]
         else:
@@ -155,9 +162,7 @@ def check_stat(type, day, part):
             raise KeyError
         delta = end - start
         return (
-            arrow.now()
-            .shift(seconds=delta)
-            .humanize(granularity=["minute", "second"])
+            arrow.now().shift(seconds=delta).humanize(granularity=["minute", "second"])
         )
     except KeyError:
         return None
@@ -178,6 +183,7 @@ def scaffold_day(day: int, data=None, description=None):
     from os import system
     import shlex
     from markdownify import markdownify as md
+
     folder = DAY_FOLDER(day)
     if not folder.exists():
         folder.mkdir()
@@ -193,8 +199,7 @@ def scaffold_day(day: int, data=None, description=None):
             puzzle_file = folder / "puzzle.md"
             puzzle_file.touch()
             puzzle_file.write_text("".join(md(d) for d in description))
-                
-        
+
             system(f"code {puzzle_file}")
 
     test = TEST_DAY_FILE(day)

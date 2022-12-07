@@ -20,8 +20,10 @@ def get_day(day):
         return arrow.now().shift(days=1).date().day
     return day
 
+
 def get_formatted_day(day):
-    return arrow.now().replace(month=12,day=int(day)).format('DD MMMM')
+    return arrow.now().replace(month=12, day=int(day)).format("DD MMMM")
+
 
 def get_path(path):
     import re
@@ -89,16 +91,13 @@ def run(path, remote):
     prefix = f"[ {'LOCAL' if not remote else 'REMOTE'} ] "
     try:
         day, puzzle = get_path(path)
-        day = cast(int,get_day(day))
+        day = cast(int, get_day(day))
         puzzle = TABLE[puzzle]
     except RuntimeError:
         return
     try:
         fn = get_puzzle_fn(day, puzzle)
-        click.echo(
-            prefix
-            + f"Running {puzzle} puzzle for {get_formatted_day(day)}"
-        )
+        click.echo(prefix + f"Running {puzzle} puzzle for {get_formatted_day(day)}")
         if not remote:
             click.echo(fn(get_local_input(day)))
         else:
@@ -124,7 +123,7 @@ def submit(path):
 
     try:
         day, puzzle = get_path(path)
-        day = cast(int,get_day(day))
+        day = cast(int, get_day(day))
         puzzle = TABLE[puzzle]
     except RuntimeError:
         return
@@ -188,21 +187,23 @@ def test(path):
     if time_spent:
         click.echo(f"{puzzle} part took {time_spent} to pass.")
 
+
 @cli.command()
 @click.argument("path", default="today")
 def stats(path):
     from aoc_2022.toolkit import check_stat
 
     def message(day, puzzle):
-        test_ts = check_stat('test', day, puzzle)
+        test_ts = check_stat("test", day, puzzle)
         if test_ts:
             click.echo(f"[Testing] {puzzle.capitalize()} passed {test_ts}")
-        submit_ts = check_stat('submit', day, puzzle)
+        submit_ts = check_stat("submit", day, puzzle)
         if submit_ts:
             click.echo(f"[Submission] {puzzle.capitalize()} passed {submit_ts}")
+
     try:
         day, puzzle = get_path(path)
-        day = cast(int,get_day(day))
+        day = cast(int, get_day(day))
 
     except RuntimeError:
         return
@@ -211,10 +212,8 @@ def stats(path):
         puzzle = TABLE[puzzle]
         message(day, puzzle)
     else:
-        message(day, 'first')
-        message(day, 'second')
-    
-        
+        message(day, "first")
+        message(day, "second")
 
 
 if __name__ == "__main__":

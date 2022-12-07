@@ -6,6 +6,7 @@ data = get_remote_input(4)
 
 def parse(data: str):
     import re
+
     return partition(re.findall(r"(?:(\d+)-(\d+)),?", data), n=2)
 
 

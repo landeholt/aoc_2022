@@ -4,8 +4,11 @@
 
 from aoc_2022.utils import isdistinct
 
+
 def subroutine(stream: str, size: int):
-    return min(i+size for i, _ in enumerate(stream) if isdistinct(stream[i:i+size]))
+    return min(
+        i + size for i, _ in enumerate(stream) if isdistinct(stream[i : i + size])
+    )
 
 
 def first(data: str):
