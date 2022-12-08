@@ -54,3 +54,10 @@ def argmin(a: Iterable[Any]):
 
 def argmax(a: Iterable[Any]):
     return max(enumerate(a), key=lambda x: x[1])[0]
+
+
+def attempt(fn):
+    try:
+        return fn()
+    except Exception:
+        pass
